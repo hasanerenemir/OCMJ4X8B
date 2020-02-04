@@ -1,8 +1,7 @@
 # Açıklama
 
 Bu kütüphane Arduino ile OCMJ4X8B-2 LCD ekran kullanımı için yazılmıştır. OCMJ4X8B-2 128x64 karaktere sahip bir LCD modüldür.
-Arduino ile kullanılan standart 128x64 karakter LCD ler farklı yapıya ve pin dizilişine sahiptir. Bu sebeple u8glib veya glcd
-gibi kütüphanlerle sürülemezler. Bu sebeple bu kütüphaneyi yazma ihtiyacı duyulmuştur.
+Arduino ile kullanılan standart 128x64 karakter LCD lerden farklı yapıya ve pin dizilişine sahiptir. Dolayısıyla u8glib veya glcd gibi kütüphanlerle sürülemezler. Bu sebeple bu kütüphaneyi yazma ihtiyacı duyulmuştur.
 
 <img src="https://img.alicdn.com/imgextra/i3/737283681/TB2lLOKv79WBuNjSspeXXaz5VXa_!!737283681.jpg" height="300px"> <img src="https://img.alicdn.com/imgextra/i2/737283681/TB2Qg9Kv1OSBuNjy0FdXXbDnVXa_!!737283681.jpg" height="300px">
 
