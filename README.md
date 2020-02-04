@@ -3,7 +3,7 @@
 Bu kütüphane Arduino ile OCMJ4X8B-2 LCD ekran kullanımı için yazılmıştır. OCMJ4X8B-2 128x64 karaktere sahip bir LCD modüldür.
 Arduino ile kullanılan standart 128x64 karakter LCD lerden farklı yapıya ve pin dizilişine sahiptir. Dolayısıyla u8glib veya glcd gibi kütüphanlerle sürülemezler. Bu sebeple bu kütüphaneyi yazma ihtiyacı duyulmuştur.
 
-<img src="https://img.alicdn.com/imgextra/i3/737283681/TB2lLOKv79WBuNjSspeXXaz5VXa_!!737283681.jpg" height="300px"> <img src="https://img.alicdn.com/imgextra/i2/737283681/TB2Qg9Kv1OSBuNjy0FdXXbDnVXa_!!737283681.jpg" height="300px">
+<img src="https://img.alicdn.com/imgextra/i3/737283681/TB2lLOKv79WBuNjSspeXXaz5VXa_!!737283681.jpg" height="270px"> <img src="https://img.alicdn.com/imgextra/i2/737283681/TB2Qg9Kv1OSBuNjy0FdXXbDnVXa_!!737283681.jpg" height="270px">
 
 Datasheet'e burdan ulaşabilirsiniz;
 <a href="www.hebangdianzi.com/upload/yj/ex_Bxl.rar">www.hebangdianzi.com/upload/yj/ex_Bxl.rar</a>
@@ -14,7 +14,8 @@ Pinler hakkında detaylı bilgiye buradan ulaşabilirsiniz;
 # Pin Yapısı
 
 Modül 18 pine sahiptir. Bunlar;<br>
-<ul style="float:left">
+
+<ul>
 <li>1 - Backlight(-)</li>
 <li>2 - Backlight(+)</li>
 <li>3 - Vss</li>
@@ -35,7 +36,6 @@ Modül 18 pine sahiptir. Bunlar;<br>
 <li>18 - RT</li>
 </ul>
 
-<div style="float:right">
 1-2   : Ekran aydınlatması için<br>
 3-4   : Modül beslemesi (Vcc:+5V, Vss:GND)<br>
 5-12  : Veri hattı (8bit)<br>
@@ -43,7 +43,6 @@ Modül 18 pine sahiptir. Bunlar;<br>
 15    : Modül resetleme hattı<br>
 16    : Bağlantı gerekmez (Boş)<br>
 17-18 : Karakter kontrast ayarı (isteğe bağlı kullanım)<br>
-</div>
 
 
 # Kütüphane Kurulumu
