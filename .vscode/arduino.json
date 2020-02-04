@@ -2,5 +2,5 @@
     "board": "arduino:avr:uno",
     "port": "/dev/cu.usbmodem14101",
     "programmer": "AVR ISP",
-    "sketch": "OCMJ4X8B.ino"
+    "sketch": "examples/OCMJ4X8B-Test/OCMJ4X8B-Test.ino"
 }

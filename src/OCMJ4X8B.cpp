@@ -5,7 +5,9 @@
 #include <inttypes.h>
 #include "Arduino.h"
 
+uint8_t row_index = 0;
 
+// Set builder
 OCMJ_LCD::OCMJ_LCD(uint8_t D0, uint8_t D1, uint8_t D2, uint8_t D3, uint8_t D4, uint8_t D5, uint8_t D6, uint8_t D7, uint8_t REQ, uint8_t BUSY, uint8_t RESET)
 {
     _req_pin = REQ;
@@ -22,7 +24,7 @@ OCMJ_LCD::OCMJ_LCD(uint8_t D0, uint8_t D1, uint8_t D2, uint8_t D3, uint8_t D4, u
     _data_pins[7] = D7;
 }
 
-//Initialize OCMJ4X8B LCD
+// Initialize OCMJ4X8B LCD
 void OCMJ_LCD::init(char char_size[] = "8x8", uint8_t row_space_size = 0)
 {
     // Set Data Pins Mode
@@ -56,21 +58,31 @@ void OCMJ_LCD::init(char char_size[] = "8x8", uint8_t row_space_size = 0)
     }
 
     _row_space_size = row_space_size;
-}
 
-void OCMJ_LCD::print(char stringValue[])
-{
-    for (uint16_t i=0; i<strlen(stringValue); i++)
+    for (uint8_t i=0; i<8; i++)
     {
-        write(stringValue[i]);
+        _row_pos[i] = (_char_y_size + _row_space_size) * i;
     }
+
+    _y_pos = _row_pos[0];
 }
 
-void OCMJ_LCD::write(uint8_t data)
+
+// Write function
+inline size_t OCMJ_LCD::write(uint8_t stringValue)
+{
+    send(stringValue);
+    return 1;
+}
+
+// Send data
+void OCMJ_LCD::send(uint8_t data)
 {
     if (_x_pos>19)
     {
-        _y_pos += _char_y_size + _row_space_size;
+        row_index++;
+        _y_pos = _row_pos[row_index];
+        //_y_pos += _char_y_size + _row_space_size;
         _x_pos = 0x04;
     }
 
@@ -78,20 +90,15 @@ void OCMJ_LCD::write(uint8_t data)
     command(_x_pos);              // X position
     command(_y_pos);              // Y position
 
-    command(data);      // Writing data
+    command(data);                // Writing data
 
     // Check status for next writing process
-    uint8_t busyStatus = digitalRead(_busy_pin);
+    busyStatus();
 
-    while(busyStatus)
-    {
-        busyStatus = digitalRead(_busy_pin);
-    }
-
-    _x_pos++;
+    _x_pos++;                      // Set next digit position
 }
 
-
+// Send command
 void OCMJ_LCD::command(uint8_t command)
 {
     write8bits(command);
@@ -99,9 +106,9 @@ void OCMJ_LCD::command(uint8_t command)
     digitalWrite(_req_pin,HIGH);
     delayMicroseconds(10);
     digitalWrite(_req_pin,LOW);
-    delayMicroseconds(10);
 }
 
+// Write data as bits
 void OCMJ_LCD::write8bits(uint8_t value)
 {
     for (uint8_t i=0; i<8; i++) {
@@ -111,48 +118,122 @@ void OCMJ_LCD::write8bits(uint8_t value)
 
 
 // Set cursor position
-void OCMJ_LCD::cursor(uint8_t row, uint8_t column)
+void OCMJ_LCD::setCursor(uint8_t row, uint8_t column)
 {
     _x_pos = 3 + column;
 
-    if (row == 1)
+    switch (row)
     {
-        _y_pos = 0;
+        case 1:
+            row_index = 0;
+            break;
+        case 2:
+            row_index = 1;
+            break;
+        case 3:
+            row_index = 2;
+            break;
+        case 4:
+            row_index = 3;
+            break;
+        case 5:
+            row_index = 4;
+            break;
+        case 6:
+            row_index = 5;
+            break;
+        case 7:
+            row_index = 6;
+            break;
+        case 8:
+            row_index = 7;
+            break;
+    }
+
+    _y_pos = _row_pos[row_index];
+}
+
+
+// Add space between rows
+void OCMJ_LCD::rowSpacer(uint8_t space_size)
+{
+    if(_x_pos != 0x04)
+    {
+        row_index++;
+        _row_pos[row_index] = _y_pos + _char_y_size + space_size;
+
     }
     else
     {
-        _y_pos = (_char_y_size + _row_space_size) * row;
+        _row_pos[row_index] = _y_pos + space_size;
     }
+    
+    for(uint8_t i=row_index+1; i<8; i++)
+    {
+        _row_pos[i] = _row_pos[i-1] + _char_y_size + _row_space_size;
+    }
+
+    _y_pos = _row_pos[row_index];
+    _x_pos = 0x04;
 }
 
-
-// Add space for rows
-void OCMJ_LCD::addSpaceRows(uint8_t space_size)
-{
-    _y_pos += space_size;
-}
-
-/*TODO*/
+// Add seperator between rows
 void OCMJ_LCD::rowSeperator()
 {
-    for (uint8_t i = 0x20; i < 0xA0; i++)
+    if(_x_pos == 20) {row_index++;}
+
+    if(_x_pos != 0x04)
     {
-        command(0xF2);
-        command(i);
-        command(0x00);
-
-        // Check status for next writing process
-        uint8_t busyStatus = digitalRead(_busy_pin);
-
-        while(busyStatus)
+        row_index++;
+        _y_pos += _char_y_size + _row_space_size + 1;
+        _x_pos = 0x04;
+        for (uint8_t i = 0x20; i < 0xA0; i++)
         {
-            busyStatus = digitalRead(_busy_pin);
+            command(0xF2);
+            command(i);
+            command(_y_pos);
+
+            // Check status for next writing process
+            busyStatus();
         }
+    } 
+    else
+    {
+        _y_pos += _row_space_size + 1;
+        for (uint8_t i = 0x20; i < 0xA0; i++)
+        {
+            command(0xF2);
+            command(i);
+            command(_y_pos);
+
+            // Check status for next writing process
+            busyStatus();
+        }
+    }
+
+    _row_pos[row_index] = _y_pos + _row_space_size + 2;
+
+    for(uint8_t i=row_index+1; i<8; i++)
+    {
+        _row_pos[i] = _row_pos[i-1] + _char_y_size + _row_space_size;
+    }
+
+    _y_pos = _row_pos[row_index];
+}
+
+// Check status for next writing process
+void OCMJ_LCD::busyStatus()
+{
+    _busy_status = digitalRead(_busy_pin);
+
+    while(_busy_status)
+    {
+        _busy_status = digitalRead(_busy_pin);
     }
 }
 
 
-
+// Clear all screen
 void OCMJ_LCD::clear()
 {
     command(0xF4);
@@ -164,4 +245,7 @@ void OCMJ_LCD::clear()
     {
         busyStatus = digitalRead(_busy_pin);
     }
+
+    _x_pos = 0x04;
+    _y_pos = 0x00;
 }
